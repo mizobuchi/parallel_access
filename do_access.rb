@@ -6,15 +6,19 @@ require 'net/ssh'
 #  label, host, user = line.split(' ', 3)
 #  info = {label => label , host => host, user => user}
 #end
-=begin
-ips = []
-File.open("tmp.txt") do |f|
+servers = []
+File.open("server.info") do |f|
   f.each_line do |line|
     label, host, user = line.split(' ')
-    ips.push( {:label => label , :host => host, :user => user} )
+    servers.push( {:label => label , :host => host, :user => user} )
   end
 end
-=end
+
+#servers =[{:label => 'excalibur',  :host =>'excalibur',  :user => 'root'}, 
+#          {:label => 'load-test',  :host =>'load-test',  :user => 'sai-member'}, 
+#          {:label => 'load-test2', :host =>'load-test2', :user => 'sai-member'},
+#          {:label => 'load-test3', :host =>'load-test3', :user => 'sai-member'},
+#          {:label => 'load-test4', :host =>'load-test4', :user => 'sai-member'}]
 
 def make_thread(servers_info, commands)
   threads = []
@@ -28,14 +32,9 @@ def make_thread(servers_info, commands)
   end
   threads
 end
-servers =[{:label => 'load-test', :host =>'load-test', :user => 'sai-member'}, 
-      {:label => 'load-test2', :host =>'load-test2', :user => 'sai-member'},
-      {:label => 'load-test3', :host =>'load-test3', :user => 'sai-member'},
-      {:label => 'load-test4', :host =>'load-test4', :user => 'sai-member'}]
-
 ips = $stdin.readlines.map do |line|
-   make_thread(servers, line).each do |label,thread|
-      puts  thread.value
-   end
+  make_thread(servers, line).each do |label,thread|
+    puts  thread.value
+  end  
 end
 
