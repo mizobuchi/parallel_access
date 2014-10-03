@@ -1,6 +1,19 @@
 require 'rubygems'
 require 'net/ssh'
 
+def make_thread(servers_info, commands)
+  threads = []
+  commands = commands.chomp.split(',')
+  commands.each_with_index do |command, i|
+    threads.push ([servers_info[i][:label], Thread.new do
+       output = nil
+       Net::SSH.start(servers_info[i][:host],servers_info[i][:user]) { |ssh| output = ssh.exec!(command) }
+       output.to_s
+     end, command])
+  end
+  threads
+end
+
 # サーバ情報読み込み
 #ips = $stdin.readlines.map do |line|
 #  label, host, user = line.split(' ', 3)
@@ -14,27 +27,10 @@ File.open("server.info") do |f|
   end
 end
 
-#servers =[{:label => 'excalibur',  :host =>'excalibur',  :user => 'root'}, 
-#          {:label => 'load-test',  :host =>'load-test',  :user => 'sai-member'}, 
-#          {:label => 'load-test2', :host =>'load-test2', :user => 'sai-member'},
-#          {:label => 'load-test3', :host =>'load-test3', :user => 'sai-member'},
-#          {:label => 'load-test4', :host =>'load-test4', :user => 'sai-member'}]
-
-def make_thread(servers_info, commands)
-  threads = []
-  commands = commands.chomp.split(',')
-  commands.each_with_index do |command, i|
-    threads.push ([servers_info[i][:label], Thread.new do
-       output = nil
-       Net::SSH.start(servers_info[i][:host],servers_info[i][:user]) { |ssh| output = ssh.exec!(command) }
-       output.to_s
-     end, command])
-  end
-  threads
-end
 ips = $stdin.readlines.map do |line|
   make_thread(servers, line).each do |label,thread|
+    thread.join
     puts  thread.value
-  end  
+    p Thread::list
+  end
 end
-
