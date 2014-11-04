@@ -14,11 +14,6 @@ def make_thread(servers_info, commands)
   threads
 end
 
-# サーバ情報読み込み
-#ips = $stdin.readlines.map do |line|
-#  label, host, user = line.split(' ', 3)
-#  info = {label => label , host => host, user => user}
-#end
 servers = []
 File.open("server.info") do |f|
   f.each_line do |line|
