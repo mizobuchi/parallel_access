@@ -28,9 +28,9 @@ File.open("server.info") do |f|
 end
 
 ips = $stdin.readlines.map do |line|
-  make_thread(servers, line).each do |label,thread|
+  make_thread(servers, line).each do |label,thread,command|
     thread.join
-    puts  thread.value
+    puts command
     p Thread::list
   end
 end
